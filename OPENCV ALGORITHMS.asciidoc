@@ -1,0 +1,355 @@
++*In[1]:*+
+[source, ipython3]
+----
+import numpy as np
+import matplotlib.pyplot as plt
+import cv2
+
+%matplotlib inline
+
+image = cv2.imread('Pictures\D1\goodi.jpg')
+image = cv2.cvtColor(image,cv2.COLOR_BGR2RGB)
+
+plt.imshow(image)
+
+gray = cv2.cvtColor(image,cv2.COLOR_BGR2HSV)
+plt.imshow(gray)
+
+cv2.imwrite('my_potrait.jpg',gray)
+----
+
+
++*Out[1]:*+
+----True
+![png](output_0_1.png)
+----
+
+
++*In[2]:*+
+[source, ipython3]
+----
+rows, cols= image.shape[:2]
+M = cv2.getRotationMatrix2D((cols/2,rows/2),90,1)
+dst = cv2.warpAffine(image,M,(cols,rows))
+plt.imshow(dst)
+----
+
+
++*Out[2]:*+
+----<matplotlib.image.AxesImage at 0x1c5f1258860>
+![png](output_1_1.png)
+----
+
+
++*In[3]:*+
+[source, ipython3]
+----
+image = cv2.imread('Pictures\D1\goodi.jpg') 
+
+smaller_image =  cv2.resize(image,None, fx = 10, fy = 10, interpolation = cv2.INTER_LINEAR)
+
+plt.imshow(smaller_image)
+----
+
+
++*Out[3]:*+
+----<matplotlib.image.AxesImage at 0x1c5f82dcd30>
+![png](output_2_1.png)
+----
+
+
++*In[4]:*+
+[source, ipython3]
+----
+M  = np.float32([[1,0,-100],[1,1,-100]])
+dst =cv2.warpAffine(image,M,(cols,rows))
+plt.imshow(image)
+----
+
+
++*Out[4]:*+
+----<matplotlib.image.AxesImage at 0x1c580034080>
+![png](output_3_1.png)
+----
+
+
++*In[5]:*+
+[source, ipython3]
+----
+gray_image = cv2.imread('Pictures\D1\goodi.jpg')
+
+ret,thresh_binary = cv2.threshold(gray_image,127,255,cv2.THRESH_BINARY)
+ret,thresh_binary_inv = cv2.threshold(gray_image,127,255,cv2.THRESH_BINARY_INV)
+ret,thresh_trunc = cv2.threshold(gray_image,127,255,cv2.THRESH_TRUNC)
+ret,thresh_tozero = cv2.threshold(gray_image,127,255,cv2.THRESH_TOZERO)
+ret,thresh_tozero_inv = cv2.threshold(gray_image,127,255,cv2.THRESH_TOZERO_INV)
+
+names = ['Original Image','BINARY','THRESH_BINARY_INV','THRESH_TRUNC','THRESH_TOZERO','THRESH_TOZERO_INV']
+images = gray_image,thresh_binary,thresh_binary_inv,thresh_trunc,thresh_tozero,thresh_tozero_inv
+
+
+for i in range(6):
+        plt.subplot(2,3,i+1),plt.imshow(images[i],'gray')
+        plt.title(names[i])
+        plt.xticks([]),plt.yticks([])
+    
+        plt.show()
+----
+
+
++*Out[5]:*+
+----
+![png](output_4_0.png)
+
+![png](output_4_1.png)
+
+![png](output_4_2.png)
+
+![png](output_4_3.png)
+
+![png](output_4_4.png)
+
+![png](output_4_5.png)
+----
+
+
++*In[6]:*+
+[source, ipython3]
+----
+#adaptivethreshold
+gray_image=cv2.imread('Pictures\D1\goodi.jpg',0)
+
+ret,thresh_global = cv2.threshold(gray_image,127,255,cv2.THRESH_BINARY)
+thresh_mean = cv2.adaptiveThreshold(gray_image,255,cv2.ADAPTIVE_THRESH_MEAN_C,cv2.THRESH_BINARY,11,2)
+thresh_gaussian = cv2.adaptiveThreshold(gray_image,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,11,2)
+names = ['Original Image','Global Thresholding','Adaptive Mean Threshold','Adaptive Gaussian Thresholding']
+images = [gray_image,thresh_global,thresh_mean,thresh_gaussian]
+
+for i in range(4):
+    plt.subplot(2,2,i+1),plt.imshow(images[i],'gray')
+    plt.title(names[i])
+    plt.xticks([0]),plt.yticks([0])
+    
+plt.show()
+----
+
+
++*Out[6]:*+
+----
+![png](output_5_0.png)
+----
+
+
++*In[7]:*+
+[source, ipython3]
+----
+#MASK BITWISE
+image = cv2.imread('Pictures\D1\goodi.jpg')
+gray = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
+ret,mask = cv2.threshold(gray,0,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+final = cv2.bitwise_not(image,image, mask=mask)
+
+plt.imshow(final)
+----
+
+
++*Out[7]:*+
+----<matplotlib.image.AxesImage at 0x1c5801b6a20>
+![png](output_6_1.png)
+----
+
+
++*In[8]:*+
+[source, ipython3]
+----
+edges = cv2.Canny(image,100,500)
+plt.imshow(edges)
+----
+
+
++*Out[8]:*+
+----<matplotlib.image.AxesImage at 0x1c5801847f0>
+![png](output_7_1.png)
+----
+
+
++*In[9]:*+
+[source, ipython3]
+----
+image = cv2.imread('Pictures\D1\goodi.jpg')
+averaging_kernel = np.ones((3,3),np.float32)/9
+filter_image = cv2.filter2D(image,-1,kernel)
+plt.imshow(dst)
+guassian_kernel_x = cv2.getGuassianKernel(5,1)
+guassian_kernel_y = cv2.getGuassianKernel(5,1)
+guassian_kernel=guassian_kernel_x*guassian_kernel_y.T
+filtered_image = cv2.filterimage2D(image,-1,guassian_kernel)
+    
+plt.imshow()
+
+
+----
+
+
++*Out[9]:*+
+----
+
+    ---------------------------------------------------------------------------
+
+    NameError                                 Traceback (most recent call last)
+
+    <ipython-input-9-ca8ef9e360cb> in <module>
+          1 image = cv2.imread('Pictures\D1\goodi.jpg')
+          2 averaging_kernel = np.ones((3,3),np.float32)/9
+    ----> 3 filter_image = cv2.filter2D(image,-1,kernel)
+          4 plt.imshow(dst)
+          5 guassian_kernel_x = cv2.getGuassianKernel(5,1)
+    
+
+    NameError: name 'kernel' is not defined
+
+----
+
+
++*In[10]:*+
+[source, ipython3]
+----
+gray_image = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY) 
+ret,thresh = cv2.threshold(gray_image,127,255,0) 
+#calculate the contours from binary image
+im , contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE) 
+with_contours = cv2.drawContours(image,contours,-1,(0,255,0),3) 
+plt.imshow(with_contours)
+----
+
+
++*Out[10]:*+
+----
+
+    ---------------------------------------------------------------------------
+
+    ValueError                                Traceback (most recent call last)
+
+    <ipython-input-10-2690443fcc09> in <module>
+          2 ret,thresh = cv2.threshold(gray_image,127,255,0)
+          3 #calculate the contours from binary image
+    ----> 4 im , contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+          5 with_contours = cv2.drawContours(image,contours,-1,(0,255,0),3)
+          6 plt.imshow(with_contours)
+    
+
+    ValueError: not enough values to unpack (expected 3, got 2)
+
+----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+import numpy as np
+import cv2 
+import matplotlib.pyplot as plt
+%matplotlib inline
+
+# Initialize the camera (use bigger indices if you use multiple cameras)
+cap = cv2.VideoCapture(0)
+# Set the video resolution to half of the possible max resolution for better performance
+cap.set(3, 1920 / 2)
+cap.set(2, 1080 / 2)
+while True:
+    # Read frame from camera stream and convert it to greyscale
+    ret, img = cap.read()
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    # Show image in cv2 window
+    cv2.imshow("videocam", img)
+    # Break if input key equals "ESC"
+    k = cv2.waitKey(30) & 0xff
+    if k == 27:
+        break
+----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+eye_cascade = cv2.CascadeClassifier('haarcascade_eye.xml')
+
+img = cv2.imread()
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+face = face_cascade.detectMultiscale(gray,1.1,4)
+
+for(x,w,z,h) in faces:
+       cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
+    
+    roi_gray = gray[y:y+h, x:x+w]
+    roi_color = img[y:y+h, x:x+w]
+    
+    
+      eyes = eye_cascade.detectMultiScale(roi_gray)
+for (ex,ey,ew,eh) in eyes:
+        cv.rectangle(roi_color,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)
+        
+plt.imshow(img)
+
+cv2.imwrite('face_detection.jpg',img)
+----
+
+
++*In[15]:*+
+[source, ipython3]
+----
+import numpy as np
+import cv2 
+import matplotlib.pyplot as plt
+%matplotlib inline
+
+#load the classifiers downloaded 
+face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+eye_cascade = cv2.CascadeClassifier('haarcascade_eye.xml')
+#read the image and convert to grayscale format
+img = cv2.imread('Pictures\D1\goodi.jpg')
+gray = cv2.cvtColor(img, cv.COLOR_BGR2GRAY)
+#calculate coordinates 
+faces = face_cascade.detectMultiScale(gray, 1.1, 4)
+for (x,y,w,h) in faces:
+    cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
+    roi_gray = gray[y:y+h, x:x+w]
+    roi_color = img[y:y+h, x:x+w]
+    eyes = eye_cascade.detectMultiScale(roi_gray)
+    #draw bounding boxes around detected features
+    for (ex,ey,ew,eh) in eyes:
+        cv2.rectangle(roi_color,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)
+#plot the image
+plt.imshow(img)
+#write image 
+cv2.imwrite('face_detection.jpg',img)
+----
+
+
++*Out[15]:*+
+----
+
+    ---------------------------------------------------------------------------
+
+    error                                     Traceback (most recent call last)
+
+    <ipython-input-15-964d60c38b4d> in <module>
+         11 gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+         12 #calculate coordinates
+    ---> 13 faces = face_cascade.detectMultiScale(gray, 1.1, 4)
+         14 for (x,y,w,h) in faces:
+         15     cv.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
+    
+
+    error: OpenCV(4.1.1) C:\projects\opencv-python\opencv\modules\objdetect\src\cascadedetect.cpp:1689: error: (-215:Assertion failed) !empty() in function 'cv::CascadeClassifier::detectMultiScale'
+    
+
+----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+
+----
